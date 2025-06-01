@@ -23,7 +23,7 @@ Build a platform where:
 
 ---
 
-## 📌 Tech Stack (Optional Section)
+## 📌 Tech Stack
 
 - **Frontend:** React, Tailwind CSS
 - **Backend:** Node.js, Express.js
@@ -32,7 +32,33 @@ Build a platform where:
 
 ---
 
-## ✨ Join the mission
+## 🛠️ Getting Started — Run This Project Locally
 
-Together, let’s make **affordable influencer marketing** a reality for startups and help creators **thrive sustainably**.
+### 1️⃣ Clone the repository
 
+```bash
+git clone https://github.com/SaiMalleshB/InfluenzaConnect.git
+cd InfluenzaConnect-main
+2️⃣ Set up the Backend
+
+cd backend
+npm install
+Create a .env file in the backend folder with necessary environment variables:
+
+PORT=5000
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+Then run the backend server:
+
+npm start
+3️⃣ Set up the Frontend
+In another terminal:
+
+cd frontend
+npm install
+npm start
+✅ Now the app should be running at:
+
+Frontend: http://localhost:5173
+Backend:  http://localhost:5000
+```
