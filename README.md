@@ -39,24 +39,25 @@ Build a platform where:
 ```bash
 git clone https://github.com/SaiMalleshB/InfluenzaConnect.git
 cd InfluenzaConnect-main
-2️⃣ Set up the Backend
 
+2️⃣ Set up the Backend
 cd backend
 npm install
-Create a .env file in the backend folder with necessary environment variables:
 
+Create a .env file in the backend folder with necessary environment variables:
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
-Then run the backend server:
 
-npm start
+Then run the backend server:
+npm run dev
+
 3️⃣ Set up the Frontend
 In another terminal:
-
 cd frontend
 npm install
-npm start
+npm run dev
+
 ✅ Now the app should be running at:
 
 Frontend: http://localhost:5173
