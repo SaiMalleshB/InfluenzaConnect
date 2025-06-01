@@ -55,6 +55,10 @@ npm run dev
 3️⃣ Set up the Frontend
 In another terminal:
 cd frontend
+touch .env
+In the .env file
+VITE_API_BASE_URL = http://localhost:5000
+
 npm install
 npm run dev
 
