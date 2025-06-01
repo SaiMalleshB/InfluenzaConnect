@@ -25,12 +25,10 @@ Build a platform where:
 
 ## 📌 Tech Stack (Optional Section)
 
-> *(Add this if you're implementing the platform and want to show your stack)*
-
 - **Frontend:** React, Tailwind CSS
 - **Backend:** Node.js, Express.js
 - **Database:** MongoDB Atlas
-- **Authentication:** JWT with HTTP-only cookies
+- **Authentication:** JWT 
 
 ---
 
