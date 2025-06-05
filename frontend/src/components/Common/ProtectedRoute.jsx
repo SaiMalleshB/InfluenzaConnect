@@ -4,6 +4,8 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const ProtectedRoute = ({ allowedRoles }) => {
   const { isAuthenticated, currentUser, loadingAuth } = useAuth();
+  console.log(currentUser.role); // what does this print?
+
 
   if (loadingAuth) {
     // You can return a loading spinner here

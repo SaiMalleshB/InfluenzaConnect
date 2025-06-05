@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import authService from '../services/authService'; // For fetching 'me' data
+import authService from '../services/authService';
 
 const DashboardPage = () => {
   const { currentUser, token } = useAuth();

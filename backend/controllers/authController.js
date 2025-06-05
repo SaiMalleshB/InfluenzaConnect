@@ -1,17 +1,14 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
-import { validationResult } from 'express-validator'; // For handling validation results
+import { validationResult } from 'express-validator';
 
 // Function to generate JWT
-const generateToken = (id, role) => {
+export const generateToken = (id, role) => { // Exported
   return jwt.sign({ id, role }, process.env.JWT_SECRET, {
-    expiresIn: '30d', // Token expires in 30 days
+    expiresIn: '30d',
   });
 };
-
-// @desc    Register a new user
-// @route   POST /api/auth/register
-// @access  Public
+// ... (rest of registerUser, loginUser, getMe remains the same)
 export const registerUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -21,25 +18,19 @@ export const registerUser = async (req, res) => {
   const { name, email, password, role } = req.body;
 
   try {
-    // Check if user already exists
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Create new user instance
     user = new User({
       name,
       email,
-      password,
-      role: role || 'influencer', // Default to 'influencer' if not provided
+      password, // Password will be hashed by pre-save hook
+      role: role || 'influencer',
     });
 
-    // Password hashing is handled by the pre-save hook in User.js model
-
     await user.save();
-
-    // Generate token
     const token = generateToken(user._id, user.role);
 
     res.status(201).json({
@@ -57,9 +48,6 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// @desc    Authenticate user & get token (Login)
-// @route   POST /api/auth/login
-// @access  Public
 export const loginUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -69,21 +57,23 @@ export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check for user by email, and include password for comparison
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials (user not found)' });
     }
+    
+    // If user has no password (e.g., signed up via Google), they can't login with password
+    if (!user.password) {
+        return res.status(400).json({ message: 'Please log in with your social account or set a password.' });
+    }
 
-    // Check if password matches
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials (password mismatch)' });
     }
 
-    // Generate token
     const token = generateToken(user._id, user.role);
 
     res.status(200).json({
@@ -101,14 +91,9 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// @desc    Get current logged-in user profile
-// @route   GET /api/auth/me
-// @access  Private (requires token)
 export const getMe = async (req, res) => {
   try {
-    // req.user is set by the 'protect' middleware
-    const user = await User.findById(req.user.id).select('-password'); // Exclude password
-
+    const user = await User.findById(req.user.id).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -118,3 +103,4 @@ export const getMe = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+

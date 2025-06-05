@@ -1,15 +1,19 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google'; // Import GoogleOAuthProvider
+
 import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Layout/Navbar';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage'; // Generic dashboard
+import DashboardPage from './pages/DashboardPage';
 import ProtectedRoute from './components/Common/ProtectedRoute';
+import ProfilePage from './pages/ProfilePage';
+import SocialAuthCallbackPage from './pages/SocialAuthCallbackPage'; // Import
+import ProfileSettingsPage from './pages/ProfileSettingsPage';     // Import
 
-// A simple unauthorized page
-const UnauthorizedPage = () => (
+const UnauthorizedPage = () => ( /* ... remains the same ... */
   <div className="text-center py-20">
     <h1 className="text-3xl font-bold text-red-600">Unauthorized Access</h1>
     <p className="text-gray-700 mt-4">You do not have permission to view this page.</p>
@@ -17,53 +21,50 @@ const UnauthorizedPage = () => (
   </div>
 );
 
-
 function App() {
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+  if (!googleClientId) {
+    console.error("Google Client ID is not configured. Please set VITE_GOOGLE_CLIENT_ID in your .env file.");
+    // Optionally render an error message or a limited version of the app
+    return <div className="text-center p-8 text-red-500">Error: Google Client ID not configured. Social logins will not work.</div>;
+  }
+  
   return (
-    <AuthProvider>
-      <Router>
-        <Navbar />
-        <main className="pt-0"> {/* Navbar is sticky, so no need for pt on main if navbar is fixed height */}
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
-            {/* Protected Routes */}
-            {/* Generic Dashboard - accessible by any authenticated user */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<DashboardPage />} />
-              {/* Add more generic protected routes here, e.g., /profile */}
-            </Route>
-
-            {/* Role-specific dashboards/routes */}
-            {/* Example: Influencer Dashboard */}
-            <Route element={<ProtectedRoute allowedRoles={['influencer', 'admin']} />}>
-              <Route path="/dashboard/influencer" element={<div>Influencer Specific Dashboard Content</div>} />
-              {/* Add more influencer-specific routes here */}
-            </Route>
-
-            {/* Example: Business Dashboard */}
-            <Route element={<ProtectedRoute allowedRoles={['business', 'admin']} />}>
-              <Route path="/dashboard/business" element={<div>Business Specific Dashboard Content</div>} />
-              {/* Add more business-specific routes here */}
-            </Route>
-            
-            {/* Fallback for any other authenticated route not matched could be a general dashboard or profile */}
-             <Route element={<ProtectedRoute />}>
-                <Route path="/profile" element={<div>User Profile Page (Protected)</div>} />
-             </Route>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <AuthProvider>
+        <Router>
+          <Navbar />
+          <main className="pt-0">
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/a" element={<ProfileSettingsPage />} />
+              <Route path="/unauthorized" element={<UnauthorizedPage />} />
+              {/* Route to handle social login callbacks from backend */}
+              <Route path="/auth/social/success" element={<SocialAuthCallbackPage />} />
 
 
-            {/* Redirect to home if no route matches */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-      </Router>
-    </AuthProvider>
+              {/* Protected Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                {/* Profile settings page, only for influencers */}
+                <Route element={<ProtectedRoute allowedRoles={['influencer', 'admin']} />}>
+                    <Route path="/profile/settings" element={<ProfileSettingsPage />} />
+              </Route>
+
+              </Route>
+              
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+        </Router>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
-
 export default App;
